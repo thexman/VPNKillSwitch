@@ -524,8 +524,8 @@ public class Main extends JFrame {
                 Process p = Runtime.getRuntime().exec("tasklist.exe");
                 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 while ((line = input.readLine()) != null) {
-                    //out.println(line);
-                    String[] tokens = line.split("\\s+");
+                    //out.println(line);         // _DEBUG
+                    String[] tokens = line.trim().split("\\s+");
                     if (tokens.length < 6)
                         continue;
                     Double size = safeParseDouble(tokens[tokens.length - 2]);
@@ -541,7 +541,7 @@ public class Main extends JFrame {
                         task += tokens[i];
                     }
                     Proc t = new Proc(task, pid.toString());
-                    //out.println(t);
+                    //out.println(t);           // _DEBUG
                     procs.add(t);
                 }
                 input.close();
@@ -550,9 +550,10 @@ public class Main extends JFrame {
                 Process p = Runtime.getRuntime().exec("ps -e");
                 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 while ((line = input.readLine()) != null) {
-                    //out.println(line);
+                    //out.println(line);                      // _DEBUG
                     // TODO: Parse linux processes lines here.
-                    String[] tokens = line.split("\\s+");
+                    String[] tokens = line.trim().split("\\s+");
+                    //out.println(Arrays.toString(tokens) + "; size=" + tokens.length);   // _DEBUG
                     if (tokens.length < 4)
                         continue;
                     Integer pid = safeParseInteger(tokens[0]);
@@ -565,7 +566,7 @@ public class Main extends JFrame {
                         task += tokens[i];
                     }
                     Proc t = new Proc(task, pid.toString());
-                    //out.println(t);
+                    //out.println(t);                  // _DEBUG
                     procs.add(t);
                 }
                 input.close();
