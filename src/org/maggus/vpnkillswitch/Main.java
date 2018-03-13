@@ -516,30 +516,37 @@ public class Main extends JFrame {
         }
     }
 
+	
+	static String[] trimQuotes(String[] s) {
+		for(int i = 0; i < s.length; i++) {
+			if (s[i].length() > 1) {
+				s[i] = s[i].substring(1, s[i].length()-1).trim();
+			}
+		}		
+		return s;
+	}
+	
     static List<Proc> listRunningProcesses() {
         try {
             List<Proc> procs = new ArrayList<Proc>();
             if (isWindows()) {
                 String line;
-                Process p = Runtime.getRuntime().exec("tasklist.exe");
+                Process p = Runtime.getRuntime().exec("tasklist.exe /FO CSV");
                 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 while ((line = input.readLine()) != null) {
                     //out.println(line);         // _DEBUG
-                    String[] tokens = line.trim().split("\\s+");
-                    if (tokens.length < 6)
+                    String[] tokens = trimQuotes(line.trim().split(","));
+                    if (tokens.length < 5) {						
+						System.out.println("Skipping line:" + line);
                         continue;
-                    Double size = safeParseDouble(tokens[tokens.length - 2]);
-                    if (size == null)
-                        continue;
-                    Integer pid = safeParseInteger(tokens[tokens.length - 5]);
+					}
+                    Double size = safeParseDouble(tokens[4]);
+
+                    Integer pid = safeParseInteger(tokens[1]);
                     if (pid == null)
                         continue;
-                    String task = "";
-                    for (int i = 0; i < tokens.length - 5; i++) {
-                        if (!task.isEmpty())
-                            task += " ";
-                        task += tokens[i];
-                    }
+                    String task = tokens[0];
+                    
                     Proc t = new Proc(task, pid.toString());
                     //out.println(t);           // _DEBUG
                     procs.add(t);
@@ -587,10 +594,12 @@ public class Main extends JFrame {
             if (isWindows()) {
                 rt.exec("taskkill /F /IM " + proc.name);     // windows only
             } else {
+                rt.exec("kill -15 " + proc.pid);     // linux
+		Thread.sleep(2000);
                 rt.exec("kill -9 " + proc.pid);     // linux
             }
         }
-        catch(IOException ex){
+        catch(IOException | InterruptedException ex){
             System.err.println("! Failed to kill process: " + proc);
             ex.printStackTrace();
         }
@@ -599,7 +608,7 @@ public class Main extends JFrame {
     static Double safeParseDouble(String str) {
         try {
             str = str.trim().replaceFirst(",", ".");
-            str = str.trim().replaceAll(",", "");
+            str = str.trim().replaceAll(",", "").replaceAll("K", "");
             return Double.parseDouble(str);
         } catch (Exception ex) {
             return null;
