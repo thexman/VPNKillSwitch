@@ -1,0 +1,10 @@
+# Global
+bin
+target/
+.settings/
+.metadata
+.project
+.classpath
+.DS_Store
+.externalToolBuilders/
+**/.idea

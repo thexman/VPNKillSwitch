@@ -1,3 +1,3 @@
 #!/bin/bash
 
-nohup java -cp /home/thexman/projects/VPNKillSwitch/src org.maggus.vpnkillswitch.Main &
+nohup java -jar target/vpnkillswitch-1.0-SNAPSHOT.jar &
